@@ -2,7 +2,7 @@
 
 Google Maps SDK for Android with Kotlin | Masterclass - Online Course
 
-Udemy: Coming soon...
+Udemy: https://www.udemy.com/course/google-maps-sdk-for-android-with-kotlin-masterclass/?referralCode=A0C73652DA559BA46ED0
 <br/>
 Skillshare: https://skl.sh/3qnwDbu
 
