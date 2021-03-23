@@ -9,11 +9,9 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import com.example.distancetrackerapp.ui.maps.MapUtil
 import com.example.distancetrackerapp.ui.maps.MapUtil.calculateTheDistance
 import com.example.distancetrackerapp.util.Constants.ACTION_SERVICE_START
 import com.example.distancetrackerapp.util.Constants.ACTION_SERVICE_STOP
@@ -66,7 +64,7 @@ class TrackerService : LifecycleService() {
         }
     }
 
-    private fun updateLocationList(location: Location){
+    private fun updateLocationList(location: Location) {
         val newLatLng = LatLng(location.latitude, location.longitude)
         locationList.value?.apply {
             add(newLatLng)
@@ -92,7 +90,8 @@ class TrackerService : LifecycleService() {
                     started.postValue(false)
                     stopForegroundService()
                 }
-                else -> {}
+                else -> {
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -105,15 +104,15 @@ class TrackerService : LifecycleService() {
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest().apply {
+        val locationRequest = LocationRequest.create().apply {
             interval = LOCATION_UPDATE_INTERVAL
             fastestInterval = LOCATION_FASTEST_UPDATE_INTERVAL
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
         )
         startTime.postValue(System.currentTimeMillis())
     }
@@ -121,7 +120,7 @@ class TrackerService : LifecycleService() {
     private fun stopForegroundService() {
         removeLocationUpdates()
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(
-                NOTIFICATION_ID
+            NOTIFICATION_ID
         )
         stopForeground(true)
         stopSelf()
@@ -143,9 +142,9 @@ class TrackerService : LifecycleService() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                    NOTIFICATION_CHANNEL_ID,
-                    NOTIFICATION_CHANNEL_NAME,
-                    IMPORTANCE_LOW
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
         }
