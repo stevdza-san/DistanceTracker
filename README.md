@@ -6,4 +6,4 @@ Udemy: https://www.udemy.com/course/google-maps-sdk-for-android-with-kotlin-mast
 <br/>
 Skillshare: https://www.skillshare.com/classes/Google-Maps-SDK-for-Android-with-Kotlin-Masterclass/444666315
 
-![alt text](https://i.postimg.cc/VNkTwPgk/Geofencing-Thumb-1.png)
+![alt text](https://i.postimg.cc/c1RcF579/maxresdefault.jpg)
