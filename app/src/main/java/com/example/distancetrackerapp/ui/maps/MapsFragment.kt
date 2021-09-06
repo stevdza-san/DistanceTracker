@@ -6,7 +6,6 @@ import android.graphics.Color
 import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +41,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMarkerClickListener, EasyPermissions.PermissionCallbacks {
+    GoogleMap.OnMarkerClickListener, EasyPermissions.PermissionCallbacks {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -61,9 +60,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
@@ -79,7 +78,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             onResetButtonClicked()
         }
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
         return binding.root
     }
@@ -127,22 +127,24 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         TrackerService.stopTime.observe(viewLifecycleOwner, {
             stopTime = it
             if (stopTime != 0L) {
-                showBiggerPicture()
-                displayResults()
+                if (locationList.isNotEmpty()) {
+                    showBiggerPicture()
+                    displayResults()
+                }
             }
         })
     }
 
     private fun drawPolyline() {
         val polyline = map.addPolyline(
-                PolylineOptions().apply {
-                    width(10f)
-                    color(Color.BLUE)
-                    jointType(JointType.ROUND)
-                    startCap(ButtCap())
-                    endCap(ButtCap())
-                    addAll(locationList)
-                }
+            PolylineOptions().apply {
+                width(10f)
+                color(Color.BLUE)
+                jointType(JointType.ROUND)
+                startCap(ButtCap())
+                endCap(ButtCap())
+                addAll(locationList)
+            }
         )
         polylineList.add(polyline)
     }
@@ -150,11 +152,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun followPolyline() {
         if (locationList.isNotEmpty()) {
             map.animateCamera(
-                    (CameraUpdateFactory.newCameraPosition(
-                            setCameraPosition(
-                                    locationList.last()
-                            )
-                    )), 1000, null)
+                (CameraUpdateFactory.newCameraPosition(
+                    setCameraPosition(
+                        locationList.last()
+                    )
+                )), 1000, null
+            )
         }
     }
 
@@ -187,10 +190,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                 val currentSecond = millisUntilFinished / 1000
                 if (currentSecond.toString() == "0") {
                     binding.timerTextView.text = "GO"
-                    binding.timerTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    binding.timerTextView.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.black
+                        )
+                    )
                 } else {
                     binding.timerTextView.text = currentSecond.toString()
-                    binding.timerTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    binding.timerTextView.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.red
+                        )
+                    )
                 }
             }
 
@@ -209,8 +222,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     private fun sendActionCommandToService(action: String) {
         Intent(
-                requireContext(),
-                TrackerService::class.java
+            requireContext(),
+            TrackerService::class.java
         ).apply {
             this.action = action
             requireContext().startService(this)
@@ -223,23 +236,23 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             bounds.include(location)
         }
         map.animateCamera(
-                CameraUpdateFactory.newLatLngBounds(
-                        bounds.build(), 100
-                ), 2000, null
+            CameraUpdateFactory.newLatLngBounds(
+                bounds.build(), 100
+            ), 2000, null
         )
         addMarker(locationList.first())
         addMarker(locationList.last())
     }
 
-    private fun addMarker(position: LatLng){
+    private fun addMarker(position: LatLng) {
         val marker = map.addMarker(MarkerOptions().position(position))
-        markerList.add(marker)
+        markerList.add(marker!!)
     }
 
     private fun displayResults() {
         val result = Result(
-                calculateTheDistance(locationList),
-                calculateElapsedTime(startTime, stopTime)
+            calculateTheDistance(locationList),
+            calculateElapsedTime(startTime, stopTime)
         )
         lifecycleScope.launch {
             delay(2500)
@@ -258,18 +271,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun mapReset() {
         fusedLocationProviderClient.lastLocation.addOnCompleteListener {
             val lastKnownLocation = LatLng(
-                    it.result.latitude,
-                    it.result.longitude
+                it.result.latitude,
+                it.result.longitude
             )
             map.animateCamera(
-                    CameraUpdateFactory.newCameraPosition(
-                            setCameraPosition(lastKnownLocation)
-                    )
+                CameraUpdateFactory.newCameraPosition(
+                    setCameraPosition(lastKnownLocation)
+                )
             )
             for (polyLine in polylineList) {
                 polyLine.remove()
             }
-            for (marker in markerList){
+            for (marker in markerList) {
                 marker.remove()
             }
             locationList.clear()
@@ -289,7 +302,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return false
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
