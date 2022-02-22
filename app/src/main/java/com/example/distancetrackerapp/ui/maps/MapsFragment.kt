@@ -91,8 +91,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     }
 
     @SuppressLint("MissingPermission", "PotentialBehaviorOverride")
-    override fun onMapReady(googleMap: GoogleMap?) {
-        map = googleMap!!
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
         map.isMyLocationEnabled = true
         map.setOnMyLocationButtonClickListener(this)
         map.setOnMarkerClickListener(this)
@@ -108,7 +108,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     }
 
     private fun observeTrackerService() {
-        TrackerService.locationList.observe(viewLifecycleOwner, {
+        TrackerService.locationList.observe(viewLifecycleOwner) {
             if (it != null) {
                 locationList = it
                 if (locationList.size > 1) {
@@ -117,14 +117,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                 drawPolyline()
                 followPolyline()
             }
-        })
-        TrackerService.started.observe(viewLifecycleOwner, {
+        }
+        TrackerService.started.observe(viewLifecycleOwner) {
             started.value = it
-        })
-        TrackerService.startTime.observe(viewLifecycleOwner, {
+        }
+        TrackerService.startTime.observe(viewLifecycleOwner) {
             startTime = it
-        })
-        TrackerService.stopTime.observe(viewLifecycleOwner, {
+        }
+        TrackerService.stopTime.observe(viewLifecycleOwner) {
             stopTime = it
             if (stopTime != 0L) {
                 if (locationList.isNotEmpty()) {
@@ -132,7 +132,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                     displayResults()
                 }
             }
-        })
+        }
     }
 
     private fun drawPolyline() {
@@ -328,7 +328,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         _binding = null
     }
 
-    override fun onMarkerClick(p0: Marker?): Boolean {
+    override fun onMarkerClick(p0: Marker): Boolean {
         return true
     }
 }
