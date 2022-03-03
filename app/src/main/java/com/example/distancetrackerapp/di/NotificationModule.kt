@@ -1,9 +1,11 @@
 package com.example.distancetrackerapp.di
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.distancetrackerapp.ui.MainActivity
 import com.example.distancetrackerapp.R
@@ -20,17 +22,27 @@ import dagger.hilt.android.scopes.ServiceScoped
 @InstallIn(ServiceComponent::class)
 object NotificationModule {
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     @ServiceScoped
     @Provides
     fun providePendingIntent(
             @ApplicationContext context: Context
     ): PendingIntent {
-        return PendingIntent.getActivity(
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getActivity(
+                    context,
+                    PENDING_INTENT_REQUEST_CODE,
+                    Intent(context, MainActivity::class.java),
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        } else {
+            PendingIntent.getActivity(
                 context,
                 PENDING_INTENT_REQUEST_CODE,
                 Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT
-        )
+            )
+        }
     }
 
     @ServiceScoped
