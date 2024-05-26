@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.os.Build
 import android.os.Looper
@@ -86,10 +87,12 @@ class TrackerService : LifecycleService() {
                     startForegroundService()
                     startLocationUpdates()
                 }
+
                 ACTION_SERVICE_STOP -> {
                     started.postValue(false)
                     stopForegroundService()
                 }
+
                 else -> {
                 }
             }
@@ -99,7 +102,15 @@ class TrackerService : LifecycleService() {
 
     private fun startForegroundService() {
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, notification.build())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification.build(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification.build())
+        }
     }
 
     @SuppressLint("MissingPermission")
